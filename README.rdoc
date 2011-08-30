@@ -38,7 +38,28 @@ All views need to subclass the Assert::View::Base class.  This class implements 
 === Initializer
 All view initializers take two things at minimum:
 * *output_io*: an IO stream to output to ($stdout, etc...)
-* *suite*: (optional) an instance of the core suite class (defaults to Assert.suite - you probably shouldn't change this default unless you know what you are doing)
+* *suite*: (optional) an instance of the core suite class; the suite of tests to run/render (defaults to Assert.suite - you probably shouldn't change this default unless you know what you are doing)
+
+=== 'suite' reader
+The suite reader provides access to the suite of tests that will be or has been run.  Use this reader to do things like count tests or test results, iterate through the tests and display detailed results, etc.  This reader provides all the model data needed to render your view.
+
+=== 'render' method
+The render method, as its name suggests, handles the overall rendering of the view.  All render methods should take the following arguments:
+* *args*: not used right now - more for view backwards compatibility in the event that args are needed
+* *runner*: runner is a block that is given to the render method by the Assert::Runner class in use.  The view class should call this block (@runner.call@) when the view is ready to run the suite of tests.  Output any view headers before calling; output any view summary/footer after calling.
+
+Here is an excerpt from the Terminal class to illustrate how a render method could be implemented:
+
+    def render(*args, &runner)
+      self.io_puts(:load_stmt)            # header info
+
+      if count(:tests) > 0
+        runner.call if runner             # run the test suite
+        self.io_puts(:detailed_results)   # show any result details
+      end
+
+      self.io_puts(:results_stmt)         # summary/footer info
+    end
 
 == License
 
