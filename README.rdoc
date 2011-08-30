@@ -20,7 +20,7 @@ Assert uses the Assert::View::Terminal view outputting to $stdout by default (ht
 
     # Override the Assert view option and assign it an instance of the different view
     # Setup the view passing it the suite accessor and the IO to output on
-    Assert.options.view = Assert::View::DifferentView.new(Assert.suite, $stdout)
+    Assert.options.view Assert::View::DifferentView.new(Assert.suite, $stdout)
 
 === Usage: define your own and override
 So, ~/.assert/option.rb is just a ruby script that is required when Assert is setting itself up.  You can use this file to define your own custom view class and then override the Assert view option like above:
@@ -34,7 +34,7 @@ So, ~/.assert/option.rb is just a ruby script that is required when Assert is se
     end
 
     # Now override the view option to use your better terminal
-    Assert.options.view = Assert::View::MyBetterTerminal.new(Assert.suite, $stdout)
+    Assert.options.view Assert::View::MyBetterTerminal.new(Assert.suite, $stdout)
 
 
 
