@@ -1,15 +1,19 @@
 = Assert::View
 
+
+
 == Description
 
 Assert::View is a collection of view classes for displaying test results using the Assert testing framework (https://github.com/teaminsight/assert).  It allows any number of views to be created and used when running tests with Assert.
+
+
 
 == Installation and Usage
 Assert::View is a dependency of Assert and will be automatically installed when you install Assert:
 
     $ gem install assert   # will install assert-view as a dependency
 
-=== Usage: override the default view with a different one 
+=== Usage: override the default view with a different one
 Assert uses the Assert::View::Terminal view outputting to $stdout by default (https://github.com/teaminsight/assert/blob/master/lib/assert/setup/view.rb).  To override and use a different view, add the following to your ~/.assert/options.rb file:
 
     require 'assert/view/different_view'
@@ -31,6 +35,8 @@ So, ~/.assert/option.rb is just a ruby script that is required when Assert is se
 
     # Now override the view option to use your better terminal
     Assert.options.view = Assert::View::MyBetterTerminal.new(Assert.suite, $stdout)
+
+
 
 == Assert::View::Base class
 All views need to subclass the Assert::View::Base class.  This class implements a few core things that assert expects of its view classes:
@@ -61,9 +67,27 @@ Here is an excerpt from the Terminal class to illustrate how a render method cou
       self.io_puts(:results_stmt)         # summary/footer info
     end
 
+=== 'handle_runtime_result' method
+This method is called as the suite of tests is being run.  It is a callback for when a new test result is added to a tests results and the result is passed as the only argument.  Use of the method is totally optional.  The Terminal view uses it to output result abbreviations while the test suite is running.
+
+=== Utilities
+The base class provides a few utilities for rendering views:
+* *io_puts*: puts output to the output IO.  Pass it the string to output or a symbol of a method that returns the string to output.
+* *io_print*: same as io_puts, printing the string instead of putting it
+* *run_time*: get a string with the suite's run time in seconds
+* *count*: helper method for counting stuff on the suite, ie: 'count(:tests)'
+
+
+
+== Roll Your Own!
+
+Assert::View is designed to be extended and customized.  Using the Base class, create your own view classes and use them as you see fit.  If you feel like sharing, fork the repo, and add a pull requests.  Bonus points to anyone who rips off other testing frameworks views (LeftRight, Turn, etc.)
+
+
+
 == License
 
-Copyright (c) <year> <copyright holders>
+Copyright (c) 2011 Kelly D. Redding and Team Insight
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
