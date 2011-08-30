@@ -14,13 +14,9 @@ Assert uses the Assert::View::Terminal view outputting to $stdout by default (ht
 
     require 'assert/view/different_view'
 
-    # in the Assert module, override the @@view variable and assign it an instance of the different view 
-    module Assert
-
-      # Setup the your view passing it the suite accessor and the IO to output on
-      @@view = View::DifferentView.new(self.suite, $stdout)
-
-    end
+    # Override the Assert view option and assign it an instance of the different view
+    # Setup the view passing it the suite accessor and the IO to output on
+    Assert.options.view = Assert::View::DifferentView.new(Assert.suite, $stdout)
 
 == Usage
 
