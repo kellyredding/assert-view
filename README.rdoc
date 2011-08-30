@@ -2,7 +2,7 @@
 
 == Description
 
-TODO: Write a description
+Assert::View is a collection of view classes for displaying test results using the Assert testing framework (https://github.com/teaminsight/assert).  It allows any number of views to be created and used when running tests with Assert.
 
 == Installation
 
