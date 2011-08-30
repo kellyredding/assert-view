@@ -10,7 +10,7 @@ Assert::View is a dependency of Assert and will be automatically installed when 
     $ gem install assert   # will install assert-view as a dependency
 
 === Usage: override the default view with a different one 
-Assert uses the Assert::View::Terminal view outputting to $stdout by default (https://github.com/teaminsight/assert/blob/master/lib/assert/setup/view.rb).  To override and use your own view, add the following to your ~/.assert/options.rb file:
+Assert uses the Assert::View::Terminal view outputting to $stdout by default (https://github.com/teaminsight/assert/blob/master/lib/assert/setup/view.rb).  To override and use a different view, add the following to your ~/.assert/options.rb file:
 
     require 'assert/view/different_view'
 
@@ -19,7 +19,7 @@ Assert uses the Assert::View::Terminal view outputting to $stdout by default (ht
     Assert.options.view = Assert::View::DifferentView.new(Assert.suite, $stdout)
 
 === Usage: define your own and override
-So, ~/.assert/option.rb is just a ruby script that get required in when Assert is setting itself up.  You can use this file to define your own custom view class and then override the Assert view option like above:
+So, ~/.assert/option.rb is just a ruby script that is required when Assert is setting itself up.  You can use this file to define your own custom view class and then override the Assert view option like above:
 
     # Say you wanted to tweak and make a better Terminal view
     require 'assert/view/terminal'
