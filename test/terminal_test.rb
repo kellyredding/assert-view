@@ -1,6 +1,6 @@
 require 'assert'
+require 'assert/options'
 
-require 'assert/core/options'
 require 'assert/view/terminal'
 
 module Assert::View
