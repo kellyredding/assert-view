@@ -32,6 +32,14 @@ So, ~/.assert/option.rb is just a ruby script that is required when Assert is se
     # Now override the view option to use your better terminal
     Assert.options.view = Assert::View::MyBetterTerminal.new(Assert.suite, $stdout)
 
+== Assert::View::Base class
+All views need to subclass the Assert::View::Base class.  This class implements a few core things that assert expects of its view classes:
+
+=== Initializer
+All view initializers take two things at minimum:
+* *output_io*: an IO stream to output to ($stdout, etc...)
+* *suite*: (optional) an instance of the core suite class (defaults to Assert.suite - you probably shouldn't change this default unless you know what you are doing)
+
 == License
 
 Copyright (c) <year> <copyright holders>
