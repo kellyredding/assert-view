@@ -7,7 +7,7 @@ module Assert::View
 
     attr_reader :suite
 
-    def initialize(suite, output_io)
+    def initialize(output_io, suite=Assert.suite)
       @suite = suite
       @out = output_io
     end
@@ -17,10 +17,6 @@ module Assert::View
     end
 
     def handle_runtime_result(result)
-      sym = result.to_sym
-      if self.respond_to?(:options)
-        io_print(self.options.send("#{sym}_abbrev"))
-      end
     end
 
     protected
@@ -33,20 +29,22 @@ module Assert::View
       @out.print(io_msg(msg, opts={}))
     end
 
-    def io_msg(msg, opts={})
-      if msg.kind_of?(::Symbol) && self.respond_to?(msg)
-        self.send(msg).to_s
-      else
-        msg.to_s
-      end
-    end
-
     def run_time(format='%.6f')
       format % @suite.run_time
     end
 
     def count(type)
       @suite.count(type)
+    end
+
+    private
+
+    def io_msg(msg, opts={})
+      if msg.kind_of?(::Symbol) && self.respond_to?(msg)
+        self.send(msg).to_s
+      else
+        msg.to_s
+      end
     end
 
   end
