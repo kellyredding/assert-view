@@ -4,6 +4,13 @@ module Assert::View
 
   class Base
     include Assert::Options
+    options do
+      default_passed_abbrev   '.'
+      default_failed_abbrev   'F'
+      default_ignored_abbrev  'I'
+      default_skipped_abbrev  'S'
+      default_errored_abbrev  'E'
+    end
 
     attr_reader :suite
 

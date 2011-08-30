@@ -9,11 +9,6 @@ module Assert::View
 
     options do
       default_styled          false
-      default_passed_abbrev   '.'
-      default_failed_abbrev   'F'
-      default_ignored_abbrev  'I'
-      default_skipped_abbrev  'S'
-      default_errored_abbrev  'E'
       default_passed_styles   :green
       default_failed_styles   :red, :bold
       default_errored_styles  :yellow, :bold

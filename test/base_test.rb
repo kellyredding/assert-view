@@ -19,4 +19,26 @@ module Assert::View
 
   end
 
+  class BaseOptionsTest < Assert::Context
+    desc "options for the base view"
+    subject do
+      Assert::View::Base.options
+    end
+
+    should "be an Options::Base object" do
+      assert_kind_of Assert::Options::Base, subject
+    end
+
+    should "default its result abbreviations" do
+      assert_equal '.', subject.default_passed_abbrev
+      assert_equal 'F', subject.default_failed_abbrev
+      assert_equal 'I', subject.default_ignored_abbrev
+      assert_equal 'S', subject.default_skipped_abbrev
+      assert_equal 'E', subject.default_errored_abbrev
+    end
+
+  end
+
+
+
 end
