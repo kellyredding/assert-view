@@ -40,6 +40,10 @@ module Assert::View
       format % @suite.run_time
     end
 
+    def runner_seed
+      @suite.runner_seed
+    end
+
     def count(type)
       @suite.count(type)
     end

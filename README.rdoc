@@ -75,6 +75,7 @@ The base class provides a few utilities for rendering views:
 * *io_puts*: puts output to the output IO.  Pass it the string to output or a symbol of a method that returns the string to output.
 * *io_print*: same as io_puts, printing the string instead of putting it
 * *run_time*: get a string with the suite's run time in seconds
+* *run_seed*: get the seed value used to run the test suite in random order
 * *count*: helper method for counting stuff on the suite, ie: 'count(:tests)'
 
 

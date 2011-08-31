@@ -20,6 +20,7 @@ module Assert::View
       self.io_puts(:load_stmt)
 
       if count(:tests) > 0
+        self.io_puts(:run_stmt)
         runner.call if runner
         self.io_puts(:detailed_results)
       end
@@ -39,6 +40,10 @@ module Assert::View
       "\nLoaded suite (#{tcount} #{tplur})"
     end
 
+    def run_stmt
+      "Running tests in random order, seed: '#{self.runner_seed}'"
+    end
+
     def detailed_results
       details = self.suite.ordered_tests.reverse.collect do |test|
         test.results.collect do |result|
@@ -56,7 +61,7 @@ module Assert::View
       rplur = (rcount = count(:results)) == 1 ? "result" : "results"
       [ "\n",
         "#{rcount} test #{rplur}: ", results_breakdown, "\n\n",
-        "(#{run_time} seconds)"
+        "(#{self.run_time} seconds)"
       ].join('')
     end
 
