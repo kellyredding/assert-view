@@ -6,11 +6,11 @@ Gem::Specification.new do |s|
   s.name        = "assert-view"
   s.version     = Assert::View::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
-  s.homepage    = "http://github.com/__/assert-views"
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.authors     = ["Kelly Redding"]
+  s.email       = ["kelly@kelredd.com"]
+  s.homepage    = "http://github.com/teaminsight/assert-view"
+  s.summary     = %q{A collection of views for use in the Assert testing framework}
+  s.description = %q{A collection of views for use in the Assert testing framework}
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -19,6 +19,4 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency("bundler")
   s.add_development_dependency("assert")
-
-  # s.add_dependency("gem-name", ["~> 0.0"])
 end
