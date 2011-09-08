@@ -50,7 +50,6 @@ module Assert::View
 
     include Assert::Options
     options do
-      default_view_name
       default_passed_abbrev   '.'
       default_failed_abbrev   'F'
       default_ignored_abbrev  'I'

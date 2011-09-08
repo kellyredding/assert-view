@@ -13,29 +13,33 @@ Assert::View is a dependency of Assert and will be automatically installed when 
 
     $ gem install assert   # will install assert-view as a dependency
 
-=== Usage: override the default view with a different one
-Assert uses the Assert::View::Terminal view outputting to $stdout by default (https://github.com/teaminsight/assert/blob/master/lib/assert/setup/view.rb).  To override and use a different view, add the following to your ~/.assert/options.rb file:
+=== Usage: the default view
+Assert uses the Assert::View::DefaultView outputting to $stdout by default (https://github.com/teaminsight/assert/blob/master/lib/assert/setup/view.rb).  To override and use a different view, add the following to your ~/.assert/options.rb file:
 
     require 'assert/view/different_view'
 
     # Override the Assert view option and assign it an instance of the different view
     # Setup the view passing it the suite accessor and the IO to output on
-    Assert.options.view Assert::View::DifferentView.new(Assert.suite, $stdout)
+    Assert.options.view Assert::View::DifferentView.new($stdout)
 
 === Usage: define your own and override
 So, ~/.assert/option.rb is just a ruby script that is required when Assert is setting itself up.  You can use this file to define your own custom view class and then override the Assert view option like above:
 
-    # Say you wanted to tweak and make a better Terminal view
-    require 'assert/view/terminal'
+    # Say you wanted to tweak and make a better DefaultView
+    require 'assert/view/default_view'
     module Assert::View
-      class MyBetterTerminal < Terminal
+      class MyBetterDefaultView < Terminal
         # override stuff and tweak it to your heart's content
       end
     end
 
     # Now override the view option to use your better terminal
-    Assert.options.view Assert::View::MyBetterTerminal.new(Assert.suite, $stdout)
+    Assert.options.view Assert::View::MyBetterDefaultView.new($stdout)
 
+
+You could also define an entirely new view from scratch.  Look at the existing views and read the below about writing your own view for more details.  Once you have written your new view, tell Assert to use it with the following:
+
+    Assert.options.view Assert::View::MyNewView.new($stdout)
 
 
 == Assert::View::Base class
@@ -49,46 +53,67 @@ All view initializers take two things at minimum:
 === 'suite' reader
 The suite reader provides access to the suite of tests that will be or has been run.  Use this reader to do things like count tests or test results, iterate through the tests and display detailed results, etc.  This reader provides all the model data needed to render your view.
 
-=== 'render' method
-The render method, as its name suggests, handles the overall rendering of the view.  All render methods should take the following arguments:
-* *args*: not used right now - more for view backwards compatibility in the event that args are needed
-* *runner*: runner is a block that is given to the render method by the Assert::Runner class in use.  The view class should call this block (@runner.call@) when the view is ready to run the suite of tests.  Output any view headers before calling; output any view summary/footer after calling.
-
-Here is an excerpt from the Terminal class to illustrate how a render method could be implemented:
-
-    def render(*args, &runner)
-      self.io_puts(:load_stmt)            # header info
-
-      if count(:tests) > 0
-        runner.call if runner             # run the test suite
-        self.io_puts(:detailed_results)   # show any result details
-      end
-
-      self.io_puts(:results_stmt)         # summary/footer info
-    end
-
-=== 'handle_runtime_result' method
-This method is called as the suite of tests is being run.  It is a callback for when a new test result is added to a tests results and the result is passed as the only argument.  Use of the method is totally optional.  The Terminal view uses it to output result abbreviations while the test suite is running.
+=== The Renderer
+The view renderer provided by the base class uses Undies (https://github.com/kelredd/undies) to define and render view templates.  It mixes in a 'render method' to the base view that handles creating an Undies::Template from the view's template definition and wiring up the necessary runner callbacks.
 
 === Utilities
 The base class provides a few utilities for rendering views:
-* *io_puts*: puts output to the output IO.  Pass it the string to output or a symbol of a method that returns the string to output.
-* *io_print*: same as io_puts, printing the string instead of putting it
 * *run_time*: get a string with the suite's run time in seconds
 * *run_seed*: get the seed value used to run the test suite in random order
 * *count*: helper method for counting stuff on the suite, ie: 'count(:tests)'
+* etc...  Check out the base class for all utilities (https://github.com/teaminsight/assert-view/blob/master/lib/assert/view/base.rb)
+
+== Anatomy of a View
+
+So I'd like to explain some key things about Assert views in detail to understand the anatomy of a view and hopefully help you understand how to create your own.
+
+First off, all views need to subclass Assert::View::Base.  The base class provides a bunch of utilities and handles all the necessary callbacks between a view and asserts Runner class.  In addition, the base class provides all methods necessary to render the view's template.  Beyond that, a View has 3 main parts:
+=== 1 - Options
+The base class mixes in Assert's options helpers so that options can be specified on any view.  The base class provides a few key options:
+* *default_passed_abbrev*:  ["."], the default abbreviation for passed results
+* *default_failed_abbrev*:  ["F"], ditto for failed results
+* *default_errored_abbrev*: ["E"], ditto for errored results
+* *default_skipped_abbrev*: ["S"], ditto for skipped results
+* *default_ignored_abbrev*: ["I"], ditto for ignored results
+
+In addition, the DefaultView specifies a few options of its own:
+* *styled*:        [true], whether or not to show ansi-styled results, set to false for plain text output
+* *passed_styles   [:green], the styles to markup passing result output with
+* *failed_styles   [:red, :bold], ditto for failed result output
+* *errored_styles  [:yellow, :bold], ditto for errored result output
+* *skipped_styles  [:cyan], ditto for skipped result output
+* *ignored_styles  [:magenta], ditto for ignored result output
+
+Use options in your views to override the base default options or to define your own for tweaking behavior and customization.
+
+=== 2 - Template / Template Helpers
+The base class provides a 'template' class method use this method to define an Undies template to render your view.  Check out Undies for details on how to create an Undies template.  Templates are given two locals to work with:
+* *view*: this local refers to the instance of the view class.  Use it to get data or run logic.
+* *runner*: this is a block used to callback to Assert's runner and run the tests.  Pass this local to the base 'run_tests' method to control when (in rendering your view) the tests are run.  Optionally pass a block to 'run_tests' that will be called each time a new result is generated by the running tests.  Use this to render live runtime result data.
+
+If you need to define some helper methods for your view to use, add them to a helpers module (check out: https://github.com/teaminsight/assert-view/blob/master/lib/assert/view/helpers/ansi.rb).  Use the 'helper' class method on your view to mix those helpers in to the view's template scope and then you can use them in your template.
+
+=== 3 - Data/Logic
+Assert views encourage defining your view's data handling and business logic seperately from your view's template.  Define instance methods on your view to access, process, and handle data and business logic.  Your template can then access them using its 'view' local.
+
+
+
+== Other Views
+TODO: put in notes about other views available for use...
 
 
 
 == Roll Your Own!
 
-Assert::View is designed to be extended and customized.  Using the Base class, create your own view classes and use them as you see fit.  If you feel like sharing, fork the repo, and add a pull requests.  Bonus points to anyone who rips off other testing frameworks views (LeftRight, Turn, etc.)
+Check out the different views available here.  Use a few and customize them using their options.  If you find you can't see your test results how you like or you prefer the way an alternate testing library outputs test results, create your own view class.  Write it inline in your '.assert/options.rb' file and hook it up with Assert's view option.  If you want to share it with everyone, fork this gem, add it in, and submit a pull request.
+
+TODO: put in guidlines for submitting new views...
 
 
 
 == License
 
-Copyright (c) 2011 Kelly D. Redding and Team Insight
+Copyright (c) 2011 Kelly Redding and Team Insight
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
