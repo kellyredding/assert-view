@@ -14,7 +14,8 @@ module Assert::View
     subject{ @view }
 
     should have_accessors :suite, :output_io, :runtime_result_callback
-    should have_instance_methods :template_file, :run_tests, :handle_runtime_result
+    should have_class_method :template
+    should have_instance_methods :run_tests, :handle_runtime_result
     should have_instance_methods :run_time, :runner_seed, :count, :tests?, :all_passed?
     should have_instance_methods :ocurring_result_types, :result_summary_msg
     should have_instance_methods :all_passed_result_summary_msg, :to_sentence
