@@ -1,129 +1,64 @@
-require 'assert/view/base'
 require 'assert/result'
-
-require 'ansi/code'
+require 'assert/options'
+require 'assert/view/base'
 
 module Assert::View
 
   class Terminal < Base
 
-    options do
-      default_styled          false
-      default_passed_styles   :green
-      default_failed_styles   :red, :bold
-      default_errored_styles  :yellow, :bold
-      default_skipped_styles  :cyan
-      default_ignored_styles  :magenta
+    def loaded_tests_statement
+      "Loaded suite (#{view.count(:tests)} test#{'s' if view.count(:tests) != 1})"
     end
 
-    def render(*args, &runner)
-      self.io_puts(:load_stmt)
-
-      if count(:tests) > 0
-        self.io_puts(:run_stmt)
-        runner.call if runner
-        self.io_puts(:detailed_results)
-      end
-
-      self.io_puts(:results_stmt)
+    def running_tests_statement
+      "Running tests in random order, seeded with: \"#{self.runner_seed}\""
     end
 
-    def handle_runtime_result(result)
-      sym = result.to_sym
-      self.io_print(result_io_msg(self.options.send("#{sym}_abbrev"), sym))
+    # show test details in reverse order from how they were collected (FILO)
+    def detailed_tests
+      @detailed_tests ||= self.suite.ordered_tests.reverse
     end
 
-    protected
-
-    def load_stmt
-      tplur = (tcount = count(:tests)) == 1 ? "test": "tests"
-      "\nLoaded suite (#{tcount} #{tplur})"
+    # get all the results that have details to show
+    # in addition, if a block is given...
+    # yield each result with its test output
+    def detailed_results(test=nil)
+      tests = test.nil? ? self.detailed_tests : [test]
+      tests.collect do |test|
+        test.results.
+        select { |result| self.show_result_details?(result) }.
+        each {|r| yield r, test.output if block_given?}
+      end.compact.flatten
     end
 
-    def run_stmt
-      "Running tests in random order, seed: '#{self.runner_seed}'"
-    end
-
-    def detailed_results
-      details = self.suite.ordered_tests.reverse.collect do |test|
-        test.results.collect do |result|
-          if show_result_details?(result)
-            [ result_io_msg(result.to_s, result.to_sym),
-              output_io_msg(test.output.to_s)
-            ].join("\n")
-          end
-        end
-      end.flatten.compact
-      "\n\n" + details.join("\n\n") if !details.empty?
-    end
-
-    def results_stmt
-      rplur = (rcount = count(:results)) == 1 ? "result" : "results"
-      [ "\n",
-        "#{rcount} test #{rplur}: ", results_breakdown, "\n\n",
-        "(#{self.run_time} seconds)"
-      ].join('')
-    end
-
-    def results_breakdown
-      if count(:passed) == count(:results)
-        stmnt = if count(:results) < 1
-          "uhh..."
-        elsif count(:results) == 1
-          "it passed"
-        else
-          "all passed"
-        end
-        result_io_msg(stmnt, :passed)
-      else
-        breakdowns = [:passed, :failed, :ignored, :skipped, :errored]
-        breakdowns = breakdowns.inject([]) do |results, result_sym|
-          results << (if count(result_sym) > 0
-            result_io_msg("#{count(result_sym)} #{result_sym}", result_sym)
-          end)
-        end.compact
-        if breakdowns.size < 2
-          breakdowns.join('')
-        elsif breakdowns.size == 2
-          breakdowns.join(" and ")
-        else
-          [breakdowns[0..-2].join(", "), breakdowns.last].join(", and ")
-        end
-      end
-    end
-
-    def result_io_msg(msg, result_sym)
-      term_styles = if self.options.styled
-        self.options.send("#{result_sym}_styles")
-      end
-      io_msg(msg, :term_styles => term_styles)
-    end
-
-    def output_io_msg(output)
-      if output && !output.empty?
-        [ "--- stdout ---",
-          io_msg(output),
-          "--------------"
-        ].collect{|i| i.strip}.join("\n")
-      end
-    end
-
-    def io_msg(msg, opts={})
-      val = super
-      if !(style = term_style(*opts[:term_styles])).empty?
-        val = style + val + ANSI.send(:reset)
-      else
-        val
-      end
-    end
-
-    def term_style(*ansi_codes)
-      ansi_codes.collect{|code| ANSI.send(code) rescue nil}.compact.join('')
-    end
-
+    # only show result details for failed or errored results
+    # show result details if a skip or passed result was issues w/ a message
     def show_result_details?(result)
       ([:failed, :errored].include?(result.to_sym)) ||
       ([:skipped, :ignored].include?(result.to_sym) && result.message)
+    end
+
+    def result_output_start_msg
+      "--- stdout ---"
+    end
+    def result_output_end_msg
+      "--------------"
+    end
+
+    # generate a sentence fragment describing the breakdown of test results
+    # if a block is given, yield each msg in the breakdown for custom template formatting
+    def results_breakdown_statement
+      self.to_sentence(self.ocurring_result_types.collect do |result_type|
+        yield(self.result_summary_msg(result_type), result_type) if block_given?
+      end)
+    end
+
+    def result_count_statement
+      "#{self.count(:results)} test result#{'s' if self.count(:results) != 1}"
+    end
+
+    def run_time_statement
+      "(#{self.run_time} seconds)"
     end
 
   end
