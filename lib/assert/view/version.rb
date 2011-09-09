@@ -1,5 +1,5 @@
 module Assert; end
 
 module Assert::View
-  VERSION = "0.2.0"
+  VERSION = "0.3.0"
 end
