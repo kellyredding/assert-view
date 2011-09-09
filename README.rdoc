@@ -19,7 +19,7 @@ Assert uses the Assert::View::DefaultView outputting to $stdout by default (http
     require 'assert/view/different_view'
 
     # Override the Assert view option and assign it an instance of the different view
-    # Setup the view passing it the suite accessor and the IO to output on
+    # Setup the view passing it the IO to output on
     Assert.options.view Assert::View::DifferentView.new($stdout)
 
 === Usage: define your own and override
@@ -28,7 +28,7 @@ So, ~/.assert/option.rb is just a ruby script that is required when Assert is se
     # Say you wanted to tweak and make a better DefaultView
     require 'assert/view/default_view'
     module Assert::View
-      class MyBetterDefaultView < Terminal
+      class MyBetterDefaultView < DefaultView
         # override stuff and tweak it to your heart's content
       end
     end
@@ -54,7 +54,7 @@ All view initializers take two things at minimum:
 The suite reader provides access to the suite of tests that will be or has been run.  Use this reader to do things like count tests or test results, iterate through the tests and display detailed results, etc.  This reader provides all the model data needed to render your view.
 
 === The Renderer
-The view renderer provided by the base class uses Undies (https://github.com/kelredd/undies) to define and render view templates.  It mixes in a 'render method' to the base view that handles creating an Undies::Template from the view's template definition and wiring up the necessary runner callbacks.
+The view renderer provided by the base class uses Undies (https://github.com/kelredd/undies) to define and render view templates.  It mixes in a 'render' method to the base view that handles creating an Undies::Template from the view's template definition and wiring up the necessary runner callbacks.
 
 === Utilities
 The base class provides a few utilities for rendering views:
@@ -67,27 +67,27 @@ The base class provides a few utilities for rendering views:
 
 So I'd like to explain some key things about Assert views in detail to understand the anatomy of a view and hopefully help you understand how to create your own.
 
-First off, all views need to subclass Assert::View::Base.  The base class provides a bunch of utilities and handles all the necessary callbacks between a view and asserts Runner class.  In addition, the base class provides all methods necessary to render the view's template.  Beyond that, a View has 3 main parts:
+First off, all views need to subclass Assert::View::Base.  The base class provides a bunch of utilities and handles all the necessary callbacks between a view and Assert's Runner class.  In addition, the base class provides all methods necessary to render the view's template.  Beyond that, a View has 3 main parts:
 === 1 - Options
 The base class mixes in Assert's options helpers so that options can be specified on any view.  The base class provides a few key options:
-* *default_passed_abbrev*:  ["."], the default abbreviation for passed results
-* *default_failed_abbrev*:  ["F"], ditto for failed results
-* *default_errored_abbrev*: ["E"], ditto for errored results
-* *default_skipped_abbrev*: ["S"], ditto for skipped results
-* *default_ignored_abbrev*: ["I"], ditto for ignored results
+* *default_passed_abbrev*:  ["."] the default abbreviation for passed results
+* *default_failed_abbrev*:  ["F"] ditto for failed results
+* *default_errored_abbrev*: ["E"] ditto for errored results
+* *default_skipped_abbrev*: ["S"] ditto for skipped results
+* *default_ignored_abbrev*: ["I"] ditto for ignored results
 
 In addition, the DefaultView specifies a few options of its own:
-* *styled*:        [true], whether or not to show ansi-styled results, set to false for plain text output
-* *passed_styles   [:green], the styles to markup passing result output with
-* *failed_styles   [:red, :bold], ditto for failed result output
-* *errored_styles  [:yellow, :bold], ditto for errored result output
-* *skipped_styles  [:cyan], ditto for skipped result output
-* *ignored_styles  [:magenta], ditto for ignored result output
+* *styled*:         [true]           whether or not to show ansi-styled results, set to false for plain text output
+* *passed_styles*   [:green]         the styles to markup passing result output with
+* *failed_styles*   [:red, :bold]    ditto for failed result output
+* *errored_styles*  [:yellow, :bold] ditto for errored result output
+* *skipped_styles*  [:cyan]          ditto for skipped result output
+* *ignored_styles*  [:magenta]       ditto for ignored result output
 
 Use options in your views to override the base default options or to define your own for tweaking behavior and customization.
 
 === 2 - Template / Template Helpers
-The base class provides a 'template' class method use this method to define an Undies template to render your view.  Check out Undies for details on how to create an Undies template.  Templates are given two locals to work with:
+The base class provides a 'template' class method.  Use this method to define an Undies template to render your view.  Check out Undies for details on how to create an Undies template.  Templates are given two locals to work with:
 * *view*: this local refers to the instance of the view class.  Use it to get data or run logic.
 * *runner*: this is a block used to callback to Assert's runner and run the tests.  Pass this local to the base 'run_tests' method to control when (in rendering your view) the tests are run.  Optionally pass a block to 'run_tests' that will be called each time a new result is generated by the running tests.  Use this to render live runtime result data.
 
