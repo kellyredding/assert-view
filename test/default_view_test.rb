@@ -1,6 +1,6 @@
 require 'assert'
 
-require 'assert/view/terminal'
+require 'assert/view/default_view'
 require 'stringio'
 
 module Assert::View
@@ -8,7 +8,7 @@ module Assert::View
   class TerminalTest < Assert::Context
     desc "the terminal view"
     setup do
-      @view = Assert::View::Terminal.new(Assert::Suite.new, StringIO.new("", "w+"))
+      @view = Assert::View::DefaultView.new(Assert::Suite.new, StringIO.new("", "w+"))
     end
     subject{ @view }
 
