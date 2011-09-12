@@ -5,8 +5,8 @@ require 'stringio'
 
 module Assert::View
 
-  class TerminalTest < Assert::Context
-    desc "the terminal view"
+  class DefaultViewTest < Assert::Context
+    desc "the default view"
     setup do
       @view = Assert::View::DefaultView.new(Assert::Suite.new, StringIO.new("", "w+"))
     end
