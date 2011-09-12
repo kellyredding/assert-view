@@ -24,7 +24,13 @@ module Assert::View
         __
 
         view.detailed_results do |result, index, test, output|
-          show_testunit_detailed_result(result, index, test)
+          # TODO: remove and call directly once result name is in assert
+          result_name = result.respond_to?(:name) ? result.name : ""
+          __ "  #{index}) #{result_name}:"
+          __ "#{result.test_name}(#{test.context_class.name}):"
+          __ result.message
+          __ "    #{result.backtrace.filtered.first.to_s}"
+
           show_any_captured_output(output)
           __
         end
