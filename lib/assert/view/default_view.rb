@@ -1,8 +1,6 @@
-require 'assert/result'
-require 'assert/options'
-
 require 'assert/view/base'
 require 'assert/view/helpers/ansi'
+require 'assert/view/helpers/capture_output'
 
 module Assert::View
 
@@ -10,7 +8,9 @@ module Assert::View
   # designed for terminal viewing.
 
   class DefaultView < Base
+    helper Helpers::CaptureOutput
     helper Helpers::AnsiStyles
+
     options do
       styled          true
       passed_styles   :green
@@ -35,15 +35,9 @@ module Assert::View
         end
         __ "\n"  # add a newline after streamed runner output
 
-        view.detailed_results do |result, output|
+        view.detailed_results do |result, index, test, output|
           __ ansi_styled_msg(result.to_s, result_ansi_styles(result))
-
-          if !output.empty?
-            __ view.result_output_start_msg
-            __ output, false
-            __ view.result_output_end_msg
-          end
-
+          show_any_captured_output(output)
           __
         end
 
@@ -65,37 +59,6 @@ module Assert::View
 
     def running_tests_statement
       "Running tests in random order, seeded with: \"#{self.runner_seed}\""
-    end
-
-    # show test details in reverse order from how they were collected (FILO)
-    def detailed_tests
-      self.suite.ordered_tests.reverse
-    end
-
-    # get all the results that have details to show
-    # in addition, if a block is given...
-    # yield each result with its test output
-    def detailed_results(test=nil)
-      tests = test.nil? ? self.detailed_tests : [test]
-      tests.collect do |test|
-        test.results.
-        select { |result| self.show_result_details?(result) }.
-        each {|r| yield r, test.output if block_given?}
-      end.compact.flatten
-    end
-
-    # only show result details for failed or errored results
-    # show result details if a skip or passed result was issues w/ a message
-    def show_result_details?(result)
-      ([:failed, :errored].include?(result.to_sym)) ||
-      ([:skipped, :ignored].include?(result.to_sym) && result.message)
-    end
-
-    def result_output_start_msg
-      "--- stdout ---"
-    end
-    def result_output_end_msg
-      "--------------"
     end
 
     # generate a sentence fragment describing the breakdown of test results

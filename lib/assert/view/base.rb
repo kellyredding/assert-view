@@ -1,3 +1,4 @@
+require 'assert/result'
 require 'assert/options'
 
 module Assert::View
@@ -116,6 +117,34 @@ module Assert::View
 
     def all_passed?
       self.count(:passed) == self.count(:results)
+    end
+
+    # get all the results that have details to show
+    # in addition, if a block is given...
+    # yield each result with its index, test, and any captured output
+    def detailed_results(test=nil)
+      tests = test.nil? ? self.suite.ordered_tests.reverse : [test]
+      result_index = 0
+      tests.collect do |test|
+        result_index += 1
+        test.results.
+        select { |result| self.show_result_details?(result) }.
+        each {|r| yield r, result_index, test, test.output if block_given?}
+      end.compact.flatten
+    end
+
+    # only show result details for failed or errored results
+    # show result details if a skip or passed result was issues w/ a message
+    def show_result_details?(result)
+      ([:failed, :errored].include?(result.to_sym)) ||
+      ([:skipped, :ignored].include?(result.to_sym) && result.message)
+    end
+
+    def capture_output_start_msg
+      "--- stdout ---"
+    end
+    def capture_output_end_msg
+      "--------------"
     end
 
     # return a list of result symbols that have actually occurred
