@@ -1,6 +1,5 @@
 require 'assert/view/base'
 require 'assert/view/helpers/capture_output'
-require 'assert/view/helpers/test_unit'
 
 module Assert::View
 
@@ -8,7 +7,6 @@ module Assert::View
 
   class TestUnitView < Base
     helper Helpers::CaptureOutput
-    helper Helpers::TestUnit
 
     template do
       __ view.loaded_suite_statement
