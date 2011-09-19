@@ -115,7 +115,7 @@ module Assert::View
       self.count(:tests) > 0
     end
 
-    def all_passed?
+    def all_pass?
       self.count(:pass) == self.count(:results)
     end
 
@@ -156,21 +156,21 @@ module Assert::View
 
     # print a result summary message for a given result type
     def result_summary_msg(result_type)
-      if result_type == :pass && self.all_passed?
-        self.all_passed_result_summary_msg
+      if result_type == :pass && self.all_pass?
+        self.all_pass_result_summary_msg
       else
         "#{self.count(result_type)} #{result_type.to_s}"
       end
     end
 
     # generate an appropriate result summary msg for all tests passing
-    def all_passed_result_summary_msg
+    def all_pass_result_summary_msg
       if self.count(:results) < 1
         "uhh..."
       elsif self.count(:results) == 1
-        "it passed"
+        "pass"
       else
-        "all passed"
+        "all pass"
       end
     end
 
