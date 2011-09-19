@@ -51,11 +51,11 @@ module Assert::View
 
     include Assert::Options
     options do
-      default_passed_abbrev   '.'
-      default_failed_abbrev   'F'
-      default_ignored_abbrev  'I'
-      default_skipped_abbrev  'S'
-      default_errored_abbrev  'E'
+      default_pass_abbrev   '.'
+      default_fail_abbrev   'F'
+      default_ignore_abbrev 'I'
+      default_skip_abbrev   'S'
+      default_error_abbrev  'E'
     end
 
     # the Renderer defines the hooks and callbacks needed for the runner to
@@ -116,7 +116,7 @@ module Assert::View
     end
 
     def all_passed?
-      self.count(:passed) == self.count(:results)
+      self.count(:pass) == self.count(:results)
     end
 
     # get all the results that have details to show
@@ -136,8 +136,8 @@ module Assert::View
     # only show result details for failed or errored results
     # show result details if a skip or passed result was issues w/ a message
     def show_result_details?(result)
-      ([:failed, :errored].include?(result.to_sym)) ||
-      ([:skipped, :ignored].include?(result.to_sym) && result.message)
+      ([:fail, :error].include?(result.to_sym)) ||
+      ([:skip, :ignore].include?(result.to_sym) && result.message)
     end
 
     def capture_output_start_msg
@@ -150,13 +150,13 @@ module Assert::View
     # return a list of result symbols that have actually occurred
     def ocurring_result_types
       @result_types ||= [
-        :passed, :failed, :ignored, :skipped, :errored
+        :pass, :fail, :ignore, :skip, :error
       ].select { |result_sym| self.count(result_sym) > 0 }
     end
 
     # print a result summary message for a given result type
     def result_summary_msg(result_type)
-      if result_type == :passed && self.all_passed?
+      if result_type == :pass && self.all_passed?
         self.all_passed_result_summary_msg
       else
         "#{self.count(result_type)} #{result_type.to_s}"

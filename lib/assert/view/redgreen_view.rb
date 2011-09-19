@@ -7,7 +7,6 @@ module Assert::View
 
   class RedgreenView < TestUnitView
     helper Helpers::CaptureOutput
-    helper Helpers::TestUnit
     helper Helpers::AnsiStyles
 
     options do

@@ -44,11 +44,11 @@ module Assert::View
     end
 
     should "default its result abbreviations" do
-      assert_equal '.', subject.default_passed_abbrev
-      assert_equal 'F', subject.default_failed_abbrev
-      assert_equal 'I', subject.default_ignored_abbrev
-      assert_equal 'S', subject.default_skipped_abbrev
-      assert_equal 'E', subject.default_errored_abbrev
+      assert_equal '.', subject.default_pass_abbrev
+      assert_equal 'F', subject.default_fail_abbrev
+      assert_equal 'I', subject.default_ignore_abbrev
+      assert_equal 'S', subject.default_skip_abbrev
+      assert_equal 'E', subject.default_error_abbrev
     end
 
   end
