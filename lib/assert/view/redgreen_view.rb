@@ -21,6 +21,7 @@ module Assert::View
 
     # this template is identical to the TestUnitView template, except:
     # - the run_tests result handler block shows ansi styled output
+    # - each detailed result renders its name styled
     # - the results_breakdown_statement renders ansi styled
     template do
       __ view.loaded_suite_statement
