@@ -47,14 +47,14 @@ module Assert::View
           __ result.message
           __ "    #{result.backtrace.filtered.first.to_s}"
 
-          show_any_captured_output(output)
+          __ captured_output(output)
           __
         end
 
       end
 
       # smae as test/unit, except styled
-      __ ansi_styled_msg(view.results_breakdown_statement, view.all_passed? ? :green : :red)
+      __ ansi_styled_msg(view.results_breakdown_statement, view.all_pass? ? :green : :red)
     end
 
   end

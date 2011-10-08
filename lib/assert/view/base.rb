@@ -119,6 +119,17 @@ module Assert::View
       self.count(:pass) == self.count(:results)
     end
 
+    # get a uniq list of contexts for the test suite
+    def suite_contexts
+      @suite_contexts ||= self.suite.tests.inject([]) do |contexts, test|
+        contexts << test.context_info.klass
+      end.uniq
+    end
+
+    def ordered_suite_contexts
+      self.suite_contexts.sort{|a,b| a.to_s <=> b.to_s}
+    end
+
     # get all the results that have details to show
     # in addition, if a block is given...
     # yield each result with its index, test, and any captured output
@@ -129,6 +140,24 @@ module Assert::View
         result_index += 1
         test.results.
         select { |result| self.show_result_details?(result) }.
+        each {|r| yield r, result_index, test, test.output if block_given?}
+      end.compact.flatten
+    end
+
+    # get all the results for a klass or other
+    def all_results_for(what=nil)
+      tests = if what.ancestors.include?(Assert::Context)
+        self.suite.ordered_tests.select do |test|
+          test.context_info.klass == what
+        end
+      else
+        selt.suite.ordered_tests
+      end
+
+      result_index = 0
+      tests.collect do |test|
+        result_index += 1
+        test.results.
         each {|r| yield r, result_index, test, test.output if block_given?}
       end.compact.flatten
     end
