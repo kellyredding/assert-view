@@ -4,7 +4,12 @@ module Assert::View::Helpers
 
     def left_column(text, opts={})
       col_width = opts[:width] || self.view.left_column_width
-      __ " "*(col_width-(text.to_s.size))+text.to_s+" ", false
+      __ case view.options.left_column_justify
+      when :left
+        text.to_s+" "*(col_width-(text.to_s.size))
+      else
+        " "*(col_width-(text.to_s.size))+text.to_s+" "
+      end, false
     end
 
     def right_column(text, opts={})

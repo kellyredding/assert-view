@@ -10,7 +10,9 @@ module Assert::View
     helper Helpers::LeftrightColumns
 
     options do
-      default_right_column_width  80
+      default_right_column_width    80
+      default_left_column_groupby   :context
+      default_left_column_justify   :right
     end
 
     template do
@@ -70,15 +72,36 @@ module Assert::View
     end
 
     def leftright_groups
-      self.ordered_suite_contexts
+      case self.options.left_column_groupby
+      when :context
+        self.ordered_suite_contexts
+      when :file
+        self.ordered_suite_files
+      else
+        []
+      end
     end
 
-    def left_column_display(klass)
-      klass.to_s
+    def left_column_display(leftcol_value)
+      case self.options.left_column_groupby
+      when :context
+        leftcol_value.to_s.gsub(/Test$/, '')
+      when :file
+        leftcol_value.to_s.gsub(File.expand_path(".", Dir.pwd), '').gsub(/^\/+test\//, '')
+      else
+        leftcol_value.to_s
+      end
     end
 
     def left_column_width
-      @left_col_width ||= self.suite_contexts.inject(0) do |max_size, klass|
+      @left_col_width ||= case self.options.left_column_groupby
+      when :context
+        self.suite_contexts.collect{|f| f.to_s.gsub(/Test$/, '')}
+      when :file
+        self.suite_files.collect{|f| f.to_s.gsub(File.expand_path(".", Dir.pwd), '').gsub(/^\/+test\//, '')}
+      else
+        []
+      end.inject(0) do |max_size, klass|
         klass.to_s.size > max_size ? klass.to_s.size : max_size
       end + 1
     end
