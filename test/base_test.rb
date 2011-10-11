@@ -17,7 +17,9 @@ module Assert::View
     should have_class_method :template
     should have_instance_methods :run_tests, :handle_runtime_result
     should have_instance_methods :run_time, :runner_seed, :count, :tests?
-    should have_instance_methods :detailed_results, :show_result_details?
+    should have_instance_methods :suite_contexts, :ordered_suite_contexts
+    should have_instance_methods :suite_files, :ordered_suite_files
+    should have_instance_methods :show_result_details?, :detailed_results, :all_results_for
     should have_instance_methods :ocurring_result_types, :result_summary_msg
     should have_instance_methods :all_pass?, :all_pass_result_summary_msg, :to_sentence
     should have_instance_methods :capture_output_start_msg, :capture_output_end_msg
