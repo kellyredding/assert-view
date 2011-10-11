@@ -47,7 +47,7 @@ module Assert::View
           __ result.message
           __ "    #{result.backtrace.filtered.first.to_s}"
 
-          __ captured_output(output)
+          __ captured_output(output) if output && !output.empty?
           __
         end
 

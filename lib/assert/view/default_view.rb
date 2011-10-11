@@ -35,7 +35,7 @@ module Assert::View
 
         view.detailed_results do |result, index, test, output|
           __ ansi_styled_msg(result.to_s, result_ansi_styles(result))
-          __ captured_output(output)
+          __ captured_output(output) if output && !output.empty?
           __
         end
 
