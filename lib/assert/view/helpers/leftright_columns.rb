@@ -14,8 +14,8 @@ module Assert::View::Helpers
 
     def right_column(text, opts={})
       lines = text.split("\n")
-      right_columnize(lines.first, opts)
-      lines[1..-1].each do |line|
+      right_columnize(lines.first || "", opts)
+      (lines[1..-1] || []).each do |line|
         self.left_column("")
         right_columnize(line, opts)
       end
