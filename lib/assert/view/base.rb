@@ -149,7 +149,7 @@ module Assert::View
       result_index = 0
       tests.collect do |test|
         result_index += 1
-        test.results.
+        test.results.reverse.
         select { |result| self.show_result_details?(result) }.
         each {|r| yield r, result_index, test, test.output if block_given?}
       end.compact.flatten
