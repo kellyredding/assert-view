@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    assert-view (0.4.1)
+    assert-view (0.4.2)
       ansi (~> 1.3)
       undies (~> 1.1)
 
