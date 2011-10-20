@@ -17,6 +17,10 @@ module Assert::View
     # b/c streaming output doesn't add any whitespace
     class Template < ::Undies::Template
 
+      def initialize(template_block, locals, io)
+        super(Undies::Source.new(template_block), locals, {:io => io})
+      end
+
       def _(data="", nl=true);  super(data.to_s + (nl ? "\n" : "")); end
       def __(data="", nl=true); super(data.to_s + (nl ? "\n" : "")); end
 
@@ -28,11 +32,10 @@ module Assert::View
     # streaming to the view's output io
     # passing in the view itself and any runner_callback as locals
     def render(*args, &runner_callback)
-      locals = {
+      Template.new(self.class.template, {
         :view => self,
         :runner => runner_callback
-      }
-      Template.new(self.output_io, locals, &self.class.template)
+      }, self.output_io)
     end
 
     module ClassMethods
