@@ -4,9 +4,7 @@ require 'assert/options'
 module Assert::View
 
   # this module is mixed in to the Assert::View::Base class
-  # it use Undies to define and render view templates
   module Renderer
-    require 'undies'
 
     def self.included(receiver)
       receiver.send(:extend, ClassMethods)
@@ -15,23 +13,40 @@ module Assert::View
     # define rendering template class to use for rendering
     # need to overwrite the '_' and '__' meths to add trailing newlines
     # b/c streaming output doesn't add any whitespace
-    class Template < ::Undies::Template
+    class Template
 
-      def _(data="", nl=true);  super(data.to_s + (nl ? "\n" : "")); end
-      def __(data="", nl=true); super(data.to_s + (nl ? "\n" : "")); end
+      def initialize(*args)
+        # setup a node stack with the given output obj
+        @io = args.pop
+
+        # apply any given data to template scope
+        data = args.last.kind_of?(::Hash) ? args.pop : {}
+        if (data.keys.map(&:to_s) & self.public_methods.map(&:to_s)).size > 0
+          raise ArgumentError, "data conflicts with template public methods."
+        end
+        metaclass = class << self; self; end
+        data.each {|key, value| metaclass.class_eval { define_method(key){value} }}
+
+        # setup a source stack with the given source
+        @source = args.pop || Proc.new {}
+        instance_eval(&@source)
+      end
+
+      def _(data="", nl=true);  @io << (data.to_s + (nl ? "\n" : "")); end
+      def __(data="", nl=true); @io << (data.to_s + (nl ? "\n" : "")); end
 
     end
 
     # this method is required by assert and is called by the test runner
-    # use Undies to render the template
+    # render the template
     # using the view's template file
     # streaming to the view's output io
     # passing in the view itself and any runner_callback as locals
     def render(*args, &runner_callback)
-      Template.new(Undies::Source.new(self.class.template), {
+      Template.new(self.class.template, {
         :view => self,
         :runner => runner_callback
-      }, Undies::Output.new(self.output_io))
+      }, self.output_io)
     end
 
     module ClassMethods
@@ -75,8 +90,8 @@ module Assert::View
     attr_accessor :suite, :output_io, :runtime_result_callback
 
     def initialize(output_io, suite=Assert.suite)
-      self.suite = suite
       self.output_io = output_io
+      self.suite     = suite
     end
 
     def view

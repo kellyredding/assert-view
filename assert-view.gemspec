@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Assert::View::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Kelly Redding"]
-  s.email       = ["kelly@kelredd.com"]
+  s.email       = ["kelly@kellyredding.com"]
   s.homepage    = "http://github.com/teaminsight/assert-view"
   s.summary     = %q{A collection of views for use in the Assert testing framework}
   s.description = %q{A collection of views for use in the Assert testing framework}
@@ -21,5 +21,4 @@ Gem::Specification.new do |s|
   s.add_development_dependency("assert")
 
   s.add_dependency("ansi", ["~> 1.3"])
-  s.add_dependency("undies", ["~> 2.0"])
 end
