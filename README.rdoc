@@ -1,5 +1,15 @@
 = Assert::View
 
+*** DEPRECATED ***
+
+Assert::View has been deprecated:
+
+* `DefaultView` has been moved into assert (https://github.com/teaminsight/assert/blob/master/lib/assert/view/default_view.rb).
+* `TestUnitView` and `RedgreenView` have been moved to assert-view-testunit (https://github.com/kellyredding/assert-view-testunit)
+* `LeftrightView` has been moved to assert-view-leftright (https://github.com/kellyredding/assert-view-leftright)
+
+
+This project is no longer actively maintained.  If you want to contribute custom views to assert, look at the above views for a model/pattern, look at the assert README docs (https://github.com/teaminsight/assert#using-3rd-party-views), and submit pull requests or create your own project for them.  Tell the assert maintainers so they can mention it in the README.
 
 
 == Description
